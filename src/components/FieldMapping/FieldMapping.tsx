@@ -20,7 +20,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
   importMode,
   onMappingChange,
 }) => {
-  // Автоматическое применение рекомендаций при первой загрузке
+  // Apply recommendations automatically on first load
   useEffect(() => {
     if (fieldMappings.length === 0 && csvHeaders.length > 0) {
       const recommendations = getFieldMappingRecommendations(csvHeaders, collectionFields)
@@ -60,18 +60,18 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
   const autoMapFields = () => {
     const autoMappings: FieldMapping[] = []
 
-    // Фильтруем пустые заголовки
+    // Drop blank headers
     const validHeaders = csvHeaders.filter(
       (header) => header && typeof header === 'string' && header.trim() !== '',
     )
 
     validHeaders.forEach((csvHeader) => {
-      // Попытка найти точное совпадение по имени
+      // Attempt to find an exact match by name
       let match = collectionFields.find(
         (field) => field.name && field.name.toLowerCase() === csvHeader.toLowerCase(),
       )
 
-      // Если точного совпадения нет, ищем по частичному совпадению
+      // Fallback to partial matches in either direction
       if (!match) {
         match = collectionFields.find(
           (field) =>
@@ -102,7 +102,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
           marginBottom: '16px',
         }}
       >
-        <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: 0 }}>Сопоставление полей</h3>
+        <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: 0 }}>Field mapping</h3>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={applyRecommendations}
@@ -118,11 +118,11 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
               gap: '4px',
               padding: '6px 12px',
             }}
-            title="Применить умные рекомендации"
+            title="Apply smart recommendations"
             type="button"
           >
             <Lightbulb size={14} />
-            Рекомендации
+            Recommendations
           </button>
           <button
             onClick={autoMapFields}
@@ -137,7 +137,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
             }}
             type="button"
           >
-            Автосопоставление
+            Auto-match
           </button>
         </div>
       </div>
@@ -150,7 +150,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
           overflow: 'hidden',
         }}
       >
-        {/* Заголовок таблицы */}
+        {/* Table header */}
         <div
           style={{
             backgroundColor: '#f8f9fa',
@@ -162,13 +162,13 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
             padding: '12px',
           }}
         >
-          <div>Поле из файла</div>
+          <div>File column</div>
           <div style={{ textAlign: 'center', width: '40px' }}></div>
-          <div>Поле коллекции</div>
+          <div>Collection field</div>
           <div style={{ width: '24px' }}></div>
         </div>
 
-        {/* Строки сопоставления */}
+        {/* Mapping rows */}
         {csvHeaders.map((csvHeader, index) => {
           const mappedField = getMappingForCsvField(csvHeader)
           const collectionField = mappedField ? getCollectionField(mappedField) : null
@@ -184,7 +184,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                 padding: '12px',
               }}
             >
-              {/* CSV поле */}
+              {/* CSV column */}
               <div>
                 <div
                   style={{
@@ -194,10 +194,10 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                 >
                   {csvHeader}
                 </div>
-                <div style={{ color: '#666', fontSize: '12px' }}>Колонка из файла</div>
+                <div style={{ color: '#666', fontSize: '12px' }}>Column from file</div>
               </div>
 
-              {/* Стрелка */}
+              {/* Arrow */}
               <div
                 style={{
                   display: 'flex',
@@ -208,7 +208,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                 <ArrowRight color="#666" size={16} />
               </div>
 
-              {/* Выбор поля коллекции */}
+              {/* Collection field selection */}
               <div>
                 <select
                   onChange={(e) => updateMapping(csvHeader, e.target.value)}
@@ -222,7 +222,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                   }}
                   value={mappedField}
                 >
-                  <option value="">Не сопоставлять</option>
+                  <option value="">Do not map</option>
                   {collectionFields.map((field) => (
                     <option key={field.name} value={field.name}>
                       {field.label || field.name} ({field.type}){field.required ? ' *' : ''}
@@ -231,7 +231,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                   ))}
                 </select>
 
-                {/* Информация о поле */}
+                {/* Field info */}
                 {collectionField && (
                   <div
                     style={{
@@ -246,7 +246,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                           marginRight: '4px',
                         }}
                       >
-                        Обязательное
+                        Required
                       </span>
                     )}
                     {collectionField.hasDefaultValue && (
@@ -256,18 +256,18 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                           marginRight: '4px',
                         }}
                       >
-                        (авто-значение)
+                        (auto value)
                       </span>
                     )}
-                    Тип: {collectionField.type}
+                    Type: {collectionField.type}
                     {collectionField.example && (
-                      <div style={{ marginTop: '2px' }}>Пример: {collectionField.example}</div>
+                      <div style={{ marginTop: '2px' }}>Example: {collectionField.example}</div>
                     )}
                   </div>
                 )}
               </div>
 
-              {/* Информация */}
+              {/* Info */}
               <div
                 style={{
                   display: 'flex',
@@ -276,7 +276,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                 }}
               >
                 {collectionField?.required && !mappedField && (
-                  <div title="Это поле обязательно для заполнения">
+                  <div title="This field is required">
                     <Info color="#dc3545" size={16} />
                   </div>
                 )}
@@ -286,9 +286,9 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
         })}
       </div>
 
-      {/* Предупреждения */}
+      {/* Warnings */}
       <div style={{ marginTop: '12px' }}>
-        {/* Несопоставленные обязательные поля - показываем только для create и upsert */}
+        {/* Unmapped required fields (create/upsert only) */}
         {(importMode === 'create' || importMode === 'upsert') &&
           (() => {
             const requiredFields = collectionFields.filter((f) => f.required)
@@ -312,9 +312,9 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                     <span aria-label="alert" role="img">
                       ⚠️
                     </span>{' '}
-                    Внимание:
+                    Warning:
                   </strong>{' '}
-                  Следующие обязательные поля не сопоставлены:{' '}
+                  The following required fields are not mapped:{' '}
                   {unmappedRequired.map((f) => f.label || f.name).join(', ')}
                   <br />
                   <small
@@ -327,7 +327,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                     <span aria-label="lamp" role="img">
                       💡
                     </span>{' '}
-                    Поля со значениями по умолчанию не требуют обязательного заполнения
+                    Fields with default values do not require manual input
                   </small>
                 </div>
               )
@@ -335,7 +335,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
             return null
           })()}
 
-        {/* Информация для режима update */}
+        {/* Update-mode info */}
         {importMode === 'update' && (
           <div
             style={{
@@ -350,14 +350,14 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
               <span aria-label="info" role="img">
                 ℹ️
               </span>{' '}
-              Информация:
+              Info:
             </strong>{' '}
-            При обновлении существующих записей обязательные поля не требуют повторного заполнения,
-            так как они уже существуют в базе данных.
+            When updating records, required fields do not need to be re-imported because they already
+            exist in the database.
           </div>
         )}
 
-        {/* Несопоставленные поля из CSV */}
+        {/* Unmapped CSV columns */}
         {(() => {
           const unmappedCsvFields = csvHeaders.filter((h) => !getMappingForCsvField(h))
 
@@ -377,9 +377,9 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
                   <span aria-label="info" role="img">
                     ℹ️
                   </span>{' '}
-                  Информация:
+                  Info:
                 </strong>{' '}
-                Следующие поля из файла не будут импортированы: {unmappedCsvFields.join(', ')}
+                The following file columns will not be imported: {unmappedCsvFields.join(', ')}
               </div>
             )
           }

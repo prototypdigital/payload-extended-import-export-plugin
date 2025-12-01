@@ -14,7 +14,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({ isLoading }) => {
 				padding: "20px",
 			}}
 		>
-			<div>Загрузка и обработка файла...</div>
+			<div>Uploading and processing file...</div>
 		</div>
 	);
 };

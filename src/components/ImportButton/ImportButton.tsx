@@ -53,7 +53,7 @@ const ImportButton: React.FC<ImportButtonProps> = ({
 
   const handleStartImport = async (settings: ImportSettings) => {
     if (tableData) {
-      // Конвертируем массивы в объекты используя заголовки
+      // Convert row arrays into objects keyed by their headers
       const dataAsObjects = tableData.rows.map((row: any) => {
         const obj: Record<string, any> = {}
         tableData.headers.forEach((header: any, index: number) => {
@@ -76,12 +76,12 @@ const ImportButton: React.FC<ImportButtonProps> = ({
   }
 
   const renderContent = () => {
-    // Если в процессе импорта или завершен
+    // When import is running or finished show progress view
     if (currentStep === 'processing' || currentStep === 'complete') {
       return <ImportProgressComponent onReset={handleResetImport} progress={importProgress} />
     }
 
-    // Если настройка импорта
+    // Show configuration step when data is ready
     if (currentStep === 'configure' && tableData) {
       return (
         <ImportConfiguration
@@ -93,7 +93,7 @@ const ImportButton: React.FC<ImportButtonProps> = ({
       )
     }
 
-    // Обычный процесс загрузки файла
+    // Default file upload experience
     if (!file) {
       return (
         <div>
@@ -131,7 +131,7 @@ const ImportButton: React.FC<ImportButtonProps> = ({
       </DrawerToggler>
       <Button onClick={() => togglerRef.current?.click()}>
         <Upload size={16} style={{ marginRight: '8px' }} />
-        <span>Импорт {collection}</span>
+        <span>Import {collection}</span>
       </Button>
       <Drawer slug={DRAWER_SLUG} title={`Import ${collection}`}>
         <div style={{ minHeight: '500px', padding: '20px' }}>{renderContent()}</div>

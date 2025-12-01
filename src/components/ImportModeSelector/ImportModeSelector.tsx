@@ -19,21 +19,21 @@ const ImportModeSelector: React.FC<ImportModeSelectorProps> = ({
 }) => {
   const modes = [
     {
-      description: 'Все записи будут добавлены как новые (дубликаты возможны)',
+      description: 'All rows will be created as new entries (duplicates possible)',
       icon: '➕',
-      label: 'Создать новые записи',
+      label: 'Create new records',
       value: 'create' as ImportMode,
     },
     {
-      description: 'Обновить только существующие записи (новые не будут созданы)',
+      description: 'Only update existing records (no new entries)',
       icon: '🔄',
-      label: 'Обновить существующие',
+      label: 'Update existing records',
       value: 'update' as ImportMode,
     },
     {
-      description: 'Создать новые записи или обновить существующие',
+      description: 'Create new records or update existing ones',
       icon: '🔀',
-      label: 'Создать новые и обновить существующие',
+      label: 'Create or update records',
       value: 'upsert' as ImportMode,
     },
   ]
@@ -47,7 +47,7 @@ const ImportModeSelector: React.FC<ImportModeSelectorProps> = ({
           marginBottom: '16px',
         }}
       >
-        Режим импорта
+        Import mode
       </h3>
 
       <div
@@ -102,7 +102,7 @@ const ImportModeSelector: React.FC<ImportModeSelectorProps> = ({
         ))}
       </div>
 
-      {/* Поле для сравнения при update/upsert */}
+      {/* Compare field for update/upsert */}
       {(selectedMode === 'update' || selectedMode === 'upsert') && (
         <div
           style={{
@@ -119,7 +119,7 @@ const ImportModeSelector: React.FC<ImportModeSelectorProps> = ({
               marginBottom: '8px',
             }}
           >
-            Поле для сравнения записей:
+            Field used to match records:
           </label>
           <select
             onChange={(e) => onCompareFieldChange(e.target.value)}
@@ -132,7 +132,7 @@ const ImportModeSelector: React.FC<ImportModeSelectorProps> = ({
             }}
             value={compareField || ''}
           >
-            <option value="">Выберите поле...</option>
+            <option value="">Select a field...</option>
             {collectionFields.map((field) => (
               <option key={field.name} value={field.name}>
                 {field.label} ({field.name})
@@ -146,7 +146,7 @@ const ImportModeSelector: React.FC<ImportModeSelectorProps> = ({
               marginTop: '4px',
             }}
           >
-            По этому полю будет определяться, существует ли запись в базе данных
+            Use this field to check whether a record already exists
           </div>
         </div>
       )}

@@ -26,14 +26,14 @@ const DataPreview: React.FC<DataPreviewProps> = ({ onConfigure, tableData }) => 
           }}
         >
           <TableIcon size={20} style={{ marginRight: '8px' }} />
-          <strong>Предварительный просмотр данных</strong>
+          <strong>Data preview</strong>
           <span
             style={{
               color: '#666',
               marginLeft: '8px',
             }}
           >
-            ({tableData.rows.length} записей)
+            ({tableData.rows.length} rows)
           </span>
         </div>
         <button
@@ -48,7 +48,7 @@ const DataPreview: React.FC<DataPreviewProps> = ({ onConfigure, tableData }) => 
           }}
           type="button"
         >
-          Настроить импорт
+          Configure import
         </button>
       </div>
 
@@ -74,7 +74,7 @@ const DataPreview: React.FC<DataPreviewProps> = ({ onConfigure, tableData }) => 
               }}
             >
               {tableData.headers.map((header, index) => {
-                // Безопасное преобразование заголовка в строку
+                // Safely convert header to string
                 const headerValue =
                   header === null || header === undefined ? `Column ${index + 1}` : String(header)
 
@@ -106,7 +106,7 @@ const DataPreview: React.FC<DataPreviewProps> = ({ onConfigure, tableData }) => 
                 }}
               >
                 {row.map((cell, cellIndex) => {
-                  // Безопасное преобразование значения в строку
+                  // Safely convert value to string
                   const cellValue = cell === null || cell === undefined ? '' : String(cell)
 
                   return (
@@ -139,7 +139,7 @@ const DataPreview: React.FC<DataPreviewProps> = ({ onConfigure, tableData }) => 
               textAlign: 'center',
             }}
           >
-            Показано первые 100 записей из {tableData.rows.length}
+            Showing first 100 rows of {tableData.rows.length}
           </div>
         )}
       </div>

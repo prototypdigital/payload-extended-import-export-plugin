@@ -7,7 +7,7 @@ export interface UploadFieldData {
 }
 
 /**
- * Обрабатывает загрузку изображений для upload полей
+ * Handles upload field values and stores referenced images in Payload media collections.
  */
 export const handleUploadField = async (
   payload: Payload,
@@ -21,27 +21,27 @@ export const handleUploadField = async (
 
   try {
     if (hasMany) {
-      // Обрабатываем массив изображений
+      // Handle multiple image URLs
       let urls: string[] = []
 
       if (Array.isArray(value)) {
-        // Уже массив
+        // Already an array
         urls = value
       } else if (typeof value === 'string') {
-        // Попытаемся распарсить как JSON
+        // Try parsing the string as JSON
         try {
           const parsed = JSON.parse(value)
           if (Array.isArray(parsed)) {
             urls = parsed
           } else {
-            // Если не JSON массив, то разбиваем по запятым
+            // Fallback: comma-separated string with URLs
             urls = value
               .split(',')
               .map((url) => url.trim())
               .filter(Boolean)
           }
         } catch {
-          // Если JSON не парсится, разбиваем по запятым
+          // If JSON parsing fails, fall back to comma-separated parsing
           urls = value
             .split(',')
             .map((url) => url.trim())
@@ -50,15 +50,15 @@ export const handleUploadField = async (
       }
 
       const uploadPromises = urls.map((url) => processUploadUrl(payload, url, relationTo))
-      // Обрабатываем изображения пачками, чтобы избежать конкурентных записей в MongoDB
-      const results = await processInBatches(uploadPromises, 3) // Максимум 3 одновременно
-      return results.filter(Boolean) as string[] // Убираем null значения
+      // Process uploads in batches to avoid hammering MongoDB with concurrent writes
+      const results = await processInBatches(uploadPromises, 3) // Max 3 concurrent uploads
+      return results.filter(Boolean) as string[] // Drop null results
     } else {
-      // Обрабатываем одиночное изображение
+      // Handle a single image URL
       let url = ''
 
       if (typeof value === 'string') {
-        // Попытаемся распарсить как JSON
+        // Try parsing the string as JSON
         try {
           const parsed = JSON.parse(value)
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -69,7 +69,7 @@ export const handleUploadField = async (
             url = value.trim()
           }
         } catch {
-          // Если JSON не парсится, используем как есть
+          // Leave the string as-is if JSON parsing fails
           url = value.trim()
         }
       } else if (Array.isArray(value) && value.length > 0) {
@@ -83,17 +83,17 @@ export const handleUploadField = async (
       return await processUploadUrl(payload, url, relationTo)
     }
   } catch (error) {
-    // Логирование ошибки для отладки
+    // Log errors during development for easier debugging
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Ошибка при обработке upload поля:', error)
+      console.error('Error while processing upload field:', error)
     }
     return null
   }
 }
 
 /**
- * Обрабатывает промисы пачками, чтобы избежать перегрузки MongoDB
+ * Processes promises in small batches to avoid overloading MongoDB writes.
  */
 const processInBatches = async <T>(promises: Promise<T>[], batchSize: number): Promise<T[]> => {
   const results: T[] = []
@@ -103,7 +103,7 @@ const processInBatches = async <T>(promises: Promise<T>[], batchSize: number): P
     const batchResults = await Promise.all(batch)
     results.push(...batchResults)
 
-    // Небольшая задержка между пачками
+    // Short pause between batches to spread the load
     if (i + batchSize < promises.length) {
       await new Promise((resolve) => setTimeout(resolve, 100))
     }
@@ -113,7 +113,7 @@ const processInBatches = async <T>(promises: Promise<T>[], batchSize: number): P
 }
 
 /**
- * Обрабатывает загрузку одного изображения по URL с повторными попытками
+ * Uploads a single image URL with retry logic.
  */
 const processUploadUrl = async (
   payload: Payload,
@@ -126,12 +126,12 @@ const processUploadUrl = async (
       if (!isValidUrl(url)) {
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.warn(`Некорректный URL: ${url}`)
+          console.warn(`Invalid URL: ${url}`)
         }
         return null
       }
 
-      // Проверяем, может уже есть такое изображение в коллекции
+      // Check whether the media already exists
       const existingMedia = await payload.find({
         collection: relationTo,
         where: {
@@ -146,23 +146,23 @@ const processUploadUrl = async (
         return String(existingMedia.docs[0].id)
       }
 
-      // Скачиваем изображение
+      // Download the image
       const response = await fetch(url)
       if (!response.ok) {
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.warn(`Не удалось скачать изображение: ${url} - статус: ${response.status}`)
+          console.warn(`Failed to download image: ${url} - status: ${response.status}`)
         }
         return null
       }
 
       const contentType = response.headers.get('content-type') || ''
 
-      // Проверяем, что это действительно изображение
+      // Ensure the response is actually an image
       if (!contentType.startsWith('image/')) {
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.warn(`URL не содержит изображение: ${url} - content-type: ${contentType}`)
+          console.warn(`URL does not contain an image: ${url} - content-type: ${contentType}`)
         }
         return null
       }
@@ -170,7 +170,7 @@ const processUploadUrl = async (
       const buffer = Buffer.from(await response.arrayBuffer())
       const filename = extractFilenameFromUrl(url)
 
-      // Создаем объект файла
+      // Build a file object Payload can accept
       const file = {
         data: buffer,
         mimetype: contentType,
@@ -178,12 +178,12 @@ const processUploadUrl = async (
         size: buffer.length,
       }
 
-      // Создаем запись в коллекции media
+      // Create a media document
       const mediaDoc = await payload.create({
         collection: relationTo,
         data: {
           alt: `${filename}`,
-          // Добавляем другие поля, которые могут быть в коллекции media
+          // Add more collection-specific fields here if needed
         },
         file,
       })
@@ -194,14 +194,14 @@ const processUploadUrl = async (
 
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
-        console.error(`Попытка ${attempt}/${retries} загрузки изображения ${url}:`, error)
+        console.error(`Attempt ${attempt}/${retries} to upload image ${url} failed:`, error)
       }
 
-      // Специальная обработка сетевых ошибок
+      // Special handling for network/storage errors
       if (error && typeof error === 'object' && 'code' in error) {
         const errorCode = (error as { code: string | number }).code
 
-        // Сетевые ошибки
+        // Network-related errors
         if (
           errorCode === 'ENOTFOUND' ||
           errorCode === 'ECONNREFUSED' ||
@@ -210,26 +210,26 @@ const processUploadUrl = async (
           if (isLastAttempt) {
             if (process.env.NODE_ENV === 'development') {
               // eslint-disable-next-line no-console
-              console.warn(`Сетевая ошибка после ${retries} попыток для ${url}. Пропускаем.`)
+              console.warn(`Network error after ${retries} attempts for ${url}. Skipping.`)
             }
             return null
           }
-          // Ждем перед повторной попыткой
+          // Wait before retrying to give the network a chance to recover
           await new Promise((resolve) => setTimeout(resolve, 1000 * attempt))
           continue
         }
 
-        // MongoDB WriteConflict ошибки
+        // MongoDB WriteConflict errors
         if (errorCode === 112 || (error as { codeName?: string }).codeName === 'WriteConflict') {
           if (isLastAttempt) {
             if (process.env.NODE_ENV === 'development') {
               // eslint-disable-next-line no-console
-              console.warn(`MongoDB WriteConflict после ${retries} попыток для ${url}. Пропускаем.`)
+              console.warn(`MongoDB WriteConflict after ${retries} attempts for ${url}. Skipping.`)
             }
             return null
           }
-          // Для MongoDB конфликтов ждем дольше и используем экспоненциальную задержку
-          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000) // Max 10 секунд
+          // Use exponential backoff for MongoDB conflicts
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000) // Max 10 seconds
           await new Promise((resolve) => setTimeout(resolve, delay))
           continue
         }
@@ -239,7 +239,7 @@ const processUploadUrl = async (
         return null
       }
 
-      // Ждем перед повторной попыткой
+      // Wait before trying again
       await new Promise((resolve) => setTimeout(resolve, 500 * attempt))
     }
   }
@@ -248,19 +248,19 @@ const processUploadUrl = async (
 }
 
 /**
- * Проверяет валидность URL
+ * Validates URL structure.
  */
 const isValidUrl = (url: string): boolean => {
   try {
     new URL(url)
-    return true // Просто проверяем, что URL валидный, без проверки расширения
+    return true // Only ensure the URL is structurally valid (no extension check)
   } catch {
     return false
   }
 }
 
 /**
- * Извлекает имя файла из URL
+ * Extracts the file name from a URL.
  */
 const extractFilenameFromUrl = (url: string): string => {
   try {
@@ -268,7 +268,7 @@ const extractFilenameFromUrl = (url: string): string => {
     const pathname = urlObj.pathname
     const filename = pathname.split('/').pop() || 'image.jpg'
 
-    // Убираем query параметры из имени файла
+    // Strip query parameters from the file name
     return filename.split('?')[0] || 'image.jpg'
   } catch {
     return 'image.jpg'

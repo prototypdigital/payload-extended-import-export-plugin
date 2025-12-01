@@ -43,7 +43,6 @@ export const useImportManager = (collectionFields: CollectionField[]) => {
         settings,
       }
 
-      // Вызываем наш Payload endpoint
       const response = await fetch('/api/import', {
         body: JSON.stringify(importRequest),
         headers: {
@@ -75,7 +74,7 @@ export const useImportManager = (collectionFields: CollectionField[]) => {
     } catch (error) {
       setImportProgress((prev) => ({
         ...prev,
-        errors: ['Ошибка подключения к серверу'],
+        errors: ['Unable to connect to the server'],
         isLoading: false,
       }))
       setCurrentStep('complete')

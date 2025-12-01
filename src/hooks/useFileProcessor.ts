@@ -17,7 +17,7 @@ export const useFileProcessor = () => {
       setTableData(parsedData)
     } catch (err) {
       console.error('Error reading file:', err)
-      setError(err instanceof Error ? err.message : 'Ошибка при чтении файла')
+      setError(err instanceof Error ? err.message : 'Error while reading the file')
       setTableData(null)
     } finally {
       setIsLoading(false)
