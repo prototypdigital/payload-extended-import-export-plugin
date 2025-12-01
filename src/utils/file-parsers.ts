@@ -7,14 +7,18 @@ export type TableData = {
 
 export const parseCSV = (text: string): TableData => {
   const lines = text.split('\n').filter((line) => line.trim())
-  if (lines.length === 0) throw new Error('Файл пуст')
+  if (lines.length === 0) {
+    throw new Error('File is empty')
+  }
 
   const headers = lines[0]
     .split(',')
     .map((h) => h.trim().replace(/"/g, ''))
-    .filter((h) => h && h.trim() !== '') // Фильтруем пустые заголовки
+    .filter((h) => h && h.trim() !== '') // Drop blank headers
 
-  if (headers.length === 0) throw new Error('Не найдены заголовки колонок')
+  if (headers.length === 0) {
+    throw new Error('Column headers not found')
+  }
 
   const rows = lines
     .slice(1)
@@ -26,26 +30,28 @@ export const parseCSV = (text: string): TableData => {
 export const parseJSON = (text: string): TableData => {
   const data = JSON.parse(text)
   if (!Array.isArray(data) || data.length === 0) {
-    throw new Error('JSON должен содержать массив объектов')
+    throw new Error('JSON must contain an array of objects')
   }
 
-  // Проверяем, что первый элемент - объект
+  // Ensure the first entry is an object
   if (typeof data[0] !== 'object' || data[0] === null) {
-    throw new Error('JSON должен содержать массив объектов')
+    throw new Error('JSON must contain an array of objects')
   }
 
-  const headers = Object.keys(data[0]).filter((key) => key && key.trim() !== '') // Фильтруем пустые ключи
+  const headers = Object.keys(data[0]).filter((key) => key && key.trim() !== '') // Drop blank keys
 
-  if (headers.length === 0) throw new Error('Не найдены заголовки полей')
+  if (headers.length === 0) {
+    throw new Error('Field headers not found')
+  }
 
   const rows = data.map((item) => {
     if (typeof item !== 'object' || item === null) {
-      // Если элемент не объект, создаем пустую строку
+      // Non-object rows become empty strings for each header
       return headers.map(() => '')
     }
     return headers.map((header) => {
       const value = item[header]
-      // Конвертируем все значения в строки, обрабатывая null/undefined
+      // Convert all values to strings, handling null/undefined
       if (value === null || value === undefined) {
         return ''
       }
@@ -67,17 +73,17 @@ export const parseXLSX = async (file: File): Promise<TableData> => {
         const data = new Uint8Array(e.target?.result as ArrayBuffer)
         const workbook = XLSX.read(data, { type: 'array' })
 
-        // Берем первый лист
+        // Use the first worksheet
         const firstSheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[firstSheetName]
 
-        // Конвертируем в JSON
+        // Convert to JSON matrix
         const jsonData = XLSX.utils.sheet_to_json(worksheet, {
           header: 1,
         })
 
         if (!Array.isArray(jsonData) || jsonData.length === 0) {
-          throw new Error('XLSX файл пуст')
+          throw new Error('XLSX file is empty')
         }
 
         const headers = (jsonData[0] as any[]).map((h) => String(h || ''))
@@ -87,10 +93,10 @@ export const parseXLSX = async (file: File): Promise<TableData> => {
 
         resolve({ headers, rows })
       } catch (error) {
-        reject(error instanceof Error ? error : new Error('Ошибка при обработке XLSX файла'))
+        reject(error instanceof Error ? error : new Error('Error processing XLSX file'))
       }
     }
-    reader.onerror = () => reject(new Error('Ошибка чтения файла'))
+    reader.onerror = () => reject(new Error('File read error'))
     reader.readAsArrayBuffer(file)
   })
 }
@@ -107,9 +113,7 @@ export const readFile = async (file: File): Promise<TableData> => {
       parsedData = parseJSON(text)
     } catch (jsonError) {
       throw new Error(
-        `Ошибка при парсинге JSON: ${
-          jsonError instanceof Error ? jsonError.message : 'Неизвестная ошибка'
-        }`,
+        `Error parsing JSON: ${jsonError instanceof Error ? jsonError.message : 'Unknown error'}`,
       )
     }
   } else if (
@@ -118,12 +122,12 @@ export const readFile = async (file: File): Promise<TableData> => {
   ) {
     parsedData = await parseXLSX(file)
   } else {
-    throw new Error('Поддерживаются файлы: CSV, JSON, XLSX, XLS')
+    throw new Error('Supported file types: CSV, JSON, XLSX, XLS')
   }
 
-  // Валидация данных перед установкой состояния
+  // Validate parsed data before returning
   if (!parsedData || !parsedData.headers || !Array.isArray(parsedData.rows)) {
-    throw new Error('Неправильная структура данных в файле')
+    throw new Error('Invalid data structure in file')
   }
 
   return parsedData

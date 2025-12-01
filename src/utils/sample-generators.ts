@@ -1,20 +1,20 @@
 import type { CollectionField } from '../types/import.js'
 
 /**
- * Создает пример файла CSV на основе полей коллекции
+ * Creates a sample CSV file based on collection fields.
  */
 export const generateSampleCSV = (fields: CollectionField[]): string => {
-  // Заголовки
+  // CSV header row
   const headers = fields.map((field) => field.name)
 
-  // Примеры данных
+  // Mock data rows
   const sampleRows = [
     fields.map((field) => field.example || ''),
     fields.map((field) => generateSampleValue(field)),
     fields.map((field) => generateSampleValue(field)),
   ]
 
-  // Формируем CSV
+  // Join everything into CSV string
   const csvLines = [
     headers.join(','),
     ...sampleRows.map((row) => row.map((value) => `"${value}"`).join(',')),
@@ -24,7 +24,7 @@ export const generateSampleCSV = (fields: CollectionField[]): string => {
 }
 
 /**
- * Создает пример файла JSON на основе полей коллекции
+ * Creates a sample JSON file based on collection fields.
  */
 export const generateSampleJSON = (fields: CollectionField[]): string => {
   const sampleObjects = [
@@ -37,7 +37,7 @@ export const generateSampleJSON = (fields: CollectionField[]): string => {
 }
 
 /**
- * Создает один объект-пример
+ * Builds a single sample object.
  */
 const createSampleObject = (fields: CollectionField[], index: number) => {
   const obj: Record<string, any> = {}
@@ -50,7 +50,7 @@ const createSampleObject = (fields: CollectionField[], index: number) => {
 }
 
 /**
- * Генерирует пример значения для поля
+ * Generates a sample value for a field.
  */
 const generateSampleValue = (field: CollectionField, index = 1): string => {
   const date = new Date()
@@ -76,15 +76,15 @@ const generateSampleValue = (field: CollectionField, index = 1): string => {
 
     case 'text':
       if (field.name.includes('title') || field.name.includes('name')) {
-        return `Товар ${index}`
+        return `Product ${index}`
       }
       if (field.name.includes('slug')) {
-        return `tovar-${index}`
+        return `product-${index}`
       }
       if (field.name.includes('sku')) {
         return `SKU-${String(index).padStart(3, '0')}`
       }
-      return field.example || `Значение ${index}`
+      return field.example || `Value ${index}`
 
     case 'upload':
       if (field.hasMany) {
@@ -93,12 +93,12 @@ const generateSampleValue = (field: CollectionField, index = 1): string => {
       return `https://picsum.photos/800/600?random=${index}`
 
     default:
-      return field.example || `Значение ${index}`
+      return field.example || `Value ${index}`
   }
 }
 
 /**
- * Получает рекомендации по полям для сопоставления
+ * Derives recommendations for mapping CSV headers to collection fields.
  */
 export const getFieldMappingRecommendations = (
   csvHeaders: string[],
@@ -114,7 +114,7 @@ export const getFieldMappingRecommendations = (
     recommendedField: string
   }> = []
 
-  // Фильтруем только валидные заголовки
+  // Keep only meaningful header values
   const validHeaders = csvHeaders.filter(
     (header) => header && typeof header === 'string' && header.trim() !== '',
   )
@@ -133,7 +133,7 @@ export const getFieldMappingRecommendations = (
     })
 
     if (bestMatch.confidence > 0.3) {
-      // Порог уверенности
+      // Confidence threshold
       recommendations.push({
         confidence: bestMatch.confidence,
         csvField: csvHeader,
@@ -146,10 +146,10 @@ export const getFieldMappingRecommendations = (
 }
 
 /**
- * Вычисляет схожесть между именем поля CSV и полем коллекции
+ * Calculates similarity between a CSV header and a collection field.
  */
 const calculateFieldSimilarity = (csvField: string, collectionField: CollectionField): number => {
-  // Проверяем входные данные
+  // Validate input
   if (!csvField || !collectionField.name) {
     return 0
   }
@@ -158,29 +158,29 @@ const calculateFieldSimilarity = (csvField: string, collectionField: CollectionF
   const fieldLower = collectionField.name.toLowerCase()
   const labelLower = (collectionField.label || collectionField.name).toLowerCase()
 
-  // Точное совпадение
+  // Exact match
   if (csvLower === fieldLower || csvLower === labelLower) {
     return 1.0
   }
 
-  // Частичное совпадение в названии
+  // Partial match in field name
   if (fieldLower.includes(csvLower) || csvLower.includes(fieldLower)) {
     return 0.8
   }
 
-  // Частичное совпадение в label
+  // Partial match in label
   if (labelLower.includes(csvLower) || csvLower.includes(labelLower)) {
     return 0.7
   }
 
-  // Синонимы
+  // Synonyms for common field names
   const synonyms: Record<string, string[]> = {
-    category: ['cat', 'категория'],
-    description: ['desc', 'описание', 'content'],
-    price: ['cost', 'цена', 'стоимость'],
-    quantity: ['qty', 'количество', 'stock'],
-    status: ['state', 'статус', 'состояние'],
-    title: ['name', 'название', 'наименование'],
+    category: ['cat', 'category'],
+    description: ['desc', 'description', 'content'],
+    price: ['cost', 'price', 'amount'],
+    quantity: ['qty', 'quantity', 'stock'],
+    status: ['state', 'status'],
+    title: ['name', 'title'],
   }
 
   for (const [key, values] of Object.entries(synonyms)) {

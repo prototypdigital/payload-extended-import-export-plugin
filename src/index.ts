@@ -18,10 +18,10 @@ export const payloadExtendedImportExportPlugin =
       config.collections = []
     }
 
-    // Добавляем endpoint для импорта
+    // Attach import endpoint
     config.endpoints = [...(config.endpoints || []), importEndpoint]
 
-    // Добавляем кнопку импорта к коллекциям
+    // Inject import button into selected collections
     if (config.collections && pluginOptions.collections) {
       config.collections = config.collections.map((collection) => {
         if (

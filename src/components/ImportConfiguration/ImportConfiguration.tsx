@@ -31,25 +31,24 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
   const [selectedLocale, setSelectedLocale] = useState<string>('en')
 
   const canProceed = () => {
-    // Для режима update обязательные поля не требуются
+    // Update mode ignores required fields
     if (importMode === 'update') {
-      // Для update требуется только поле сравнения и минимум одно сопоставление
+      // Requires compare field + at least one mapping
       const isUsingIdForComparison = compareField === 'id'
       const hasIdMapping = fieldMappings.some((m) => m.collectionField === 'id')
 
       return fieldMappings.length > 0 && compareField && (!isUsingIdForComparison || hasIdMapping)
     }
 
-    // Для create и upsert проверяем обязательные поля
+    // Create/upsert require required fields to be mapped
     const requiredFields = collectionFields.filter((f) => f.required)
     const mappedFieldNames = fieldMappings.map((m) => m.collectionField)
     const unmappedRequired = requiredFields.filter((f) => !mappedFieldNames.includes(f.name))
 
-    // Для режима upsert требуется поле сравнения
+    // Upsert mode always needs a compare field
     const needsCompareField = importMode === 'upsert'
 
-    // Дополнительная проверка: если выбран режим обновления и поле сравнения - ID,
-    // то ID должно быть в маппинге
+    // If comparing by ID ensure ID is present in mappings
     const isUsingIdForComparison = compareField === 'id'
     const hasIdMapping = mappedFieldNames.includes('id')
 
@@ -73,13 +72,13 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
       mode: importMode,
     }
 
-    // Передаем и настройки, и данные
+    // Submit both settings and rows
     onImport(settings, tableData.rows)
   }
 
   return (
     <div>
-      {/* Заголовок */}
+      {/* Header */}
       <div
         style={{
           alignItems: 'center',
@@ -98,7 +97,7 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
               margin: 0,
             }}
           >
-            Настройка импорта
+            Import configuration
           </h2>
           <p
             style={{
@@ -107,7 +106,7 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
               margin: '4px 0 0 0',
             }}
           >
-            Готовится к импорту {tableData.rows.length} записей
+            Preparing to import {tableData.rows.length} rows
           </p>
         </div>
         <button
@@ -122,11 +121,11 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
           }}
           type="button"
         >
-          ← Назад к файлу
+          ← Back to file
         </button>
       </div>
 
-      {/* Режим импорта */}
+      {/* Import mode */}
       <ImportModeSelector
         collectionFields={collectionFields}
         compareField={compareField}
@@ -135,10 +134,10 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
         selectedMode={importMode}
       />
 
-      {/* Выбор локали */}
+      {/* Locale selection */}
       <LocaleSelector onChange={setSelectedLocale} value={selectedLocale} />
 
-      {/* Сопоставление полей */}
+      {/* Field mapping */}
       <FieldMappingComponent
         collectionFields={collectionFields}
         csvHeaders={tableData.headers}
@@ -147,7 +146,7 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
         onMappingChange={setFieldMappings}
       />
 
-      {/* Итоговая информация и кнопка импорта */}
+      {/* Summary + action */}
       <div
         style={{
           backgroundColor: '#f8f9fa',
@@ -157,25 +156,25 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
         }}
       >
         <div style={{ marginBottom: '16px' }}>
-          <h4 style={{ fontSize: '16px', margin: '0 0 12px 0' }}>Итоговая информация:</h4>
+          <h4 style={{ fontSize: '16px', margin: '0 0 12px 0' }}>Summary:</h4>
           <div style={{ color: '#555', fontSize: '14px' }}>
             <div>
-              • Записей для импорта: <strong>{tableData.rows.length}</strong>
+              • Rows to import: <strong>{tableData.rows.length}</strong>
             </div>
             <div>
-              • Сопоставленных полей: <strong>{fieldMappings.length}</strong>
+              • Mapped fields: <strong>{fieldMappings.length}</strong>
             </div>
             <div>
-              • Режим импорта:{' '}
+              • Import mode:{' '}
               <strong>
-                {importMode === 'create' && 'Создать новые записи'}
-                {importMode === 'update' && 'Обновить существующие'}
-                {importMode === 'upsert' && 'Создать новые и обновить существующие'}
+                {importMode === 'create' && 'Create new records'}
+                {importMode === 'update' && 'Update existing records'}
+                {importMode === 'upsert' && 'Create or update records'}
               </strong>
             </div>
             {compareField && (
               <div>
-                • Поле для сравнения: <strong>{compareField}</strong>
+                • Compare field: <strong>{compareField}</strong>
               </div>
             )}
           </div>
@@ -206,7 +205,7 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
             <span aria-label="rocket" role="img">
               🚀
             </span>{' '}
-            Начать импорт
+            Start import
           </button>
 
           {!canProceed() && (
@@ -222,19 +221,19 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
                 const hasIdMapping = mappedFieldNames.includes('id')
 
                 if (fieldMappings.length === 0) {
-                  return 'Сопоставьте хотя бы одно поле'
+                  return 'Map at least one field'
                 }
 
-                // Для режима update не проверяем обязательные поля
+                // Skip required check for update mode
                 if (importMode !== 'update' && unmappedRequired.length > 0) {
-                  return `Сопоставьте обязательные поля: ${unmappedRequired.map((f) => f.label).join(', ')}`
+                  return `Map required fields: ${unmappedRequired.map((f) => f.label).join(', ')}`
                 }
 
                 if (needsCompareField && !compareField) {
-                  return 'Выберите поле для сравнения записей'
+                  return 'Select a field to match records'
                 }
                 if (isUsingIdForComparison && !hasIdMapping) {
-                  return 'Для сравнения по ID необходимо сопоставить поле ID с колонкой из файла'
+                  return 'When comparing by ID the ID field must be mapped to a file column'
                 }
                 return ''
               })()}

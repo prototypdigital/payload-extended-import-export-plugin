@@ -17,7 +17,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error }) => {
         padding: '16px',
       }}
     >
-      <strong>Ошибка:</strong> {error}
+      <strong>Error:</strong> {error}
     </div>
   )
 }

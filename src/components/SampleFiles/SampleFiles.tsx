@@ -1,7 +1,8 @@
 import { Check, Copy, Download, FileText } from 'lucide-react'
 import React, { useState } from 'react'
 
-import { CollectionField } from '../../types/import.js'
+import type { CollectionField } from '../../types/import.js'
+
 import { generateSampleCSV, generateSampleJSON } from '../../utils/sample-generators.js'
 
 interface SampleFilesProps {
@@ -47,9 +48,9 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
         }}
       >
         <span aria-label="file" role="img">
-          span 📄
+          📄
         </span>{' '}
-        Примеры файлов для импорта в "{collectionName}"
+        Sample files for importing into “{collectionName}”
       </h4>
 
       <div
@@ -59,7 +60,7 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
           gridTemplateColumns: '1fr 1fr',
         }}
       >
-        {/* CSV пример */}
+        {/* CSV example */}
         <div
           style={{
             backgroundColor: '#fff',
@@ -80,7 +81,7 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
           >
             <div style={{ alignItems: 'center', display: 'flex' }}>
               <FileText size={16} style={{ marginRight: '8px' }} />
-              <strong>CSV формат</strong>
+              <strong>CSV format</strong>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
               <button
@@ -95,7 +96,7 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
                   fontSize: '12px',
                   padding: '4px 8px',
                 }}
-                title="Копировать в буфер обмена"
+                title="Copy to clipboard"
                 type="button"
               >
                 {copiedFormat === 'csv' ? <Check color="#28a745" size={14} /> : <Copy size={14} />}
@@ -112,7 +113,7 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
                   fontSize: '12px',
                   padding: '4px 8px',
                 }}
-                title="Скачать CSV файл"
+                title="Download CSV file"
                 type="button"
               >
                 <Download size={14} />
@@ -134,7 +135,7 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
           </div>
         </div>
 
-        {/* JSON пример */}
+        {/* JSON example */}
         <div
           style={{
             backgroundColor: '#fff',
@@ -155,7 +156,7 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
           >
             <div style={{ alignItems: 'center', display: 'flex' }}>
               <FileText size={16} style={{ marginRight: '8px' }} />
-              <strong>JSON формат</strong>
+              <strong>JSON format</strong>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
               <button
@@ -170,7 +171,7 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
                   fontSize: '12px',
                   padding: '4px 8px',
                 }}
-                title="Копировать в буфер обмена"
+                title="Copy to clipboard"
                 type="button"
               >
                 {copiedFormat === 'json' ? <Check color="#28a745" size={14} /> : <Copy size={14} />}
@@ -189,7 +190,7 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
                   fontSize: '12px',
                   padding: '4px 8px',
                 }}
-                title="Скачать JSON файл"
+                title="Download JSON file"
                 type="button"
               >
                 <Download size={14} />
@@ -212,7 +213,7 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
         </div>
       </div>
 
-      {/* Информация о полях */}
+      {/* Field information */}
       <div
         style={{
           backgroundColor: '#e3f2fd',
@@ -227,10 +228,10 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
           <span aria-label="light bulb" role="img">
             💡
           </span>{' '}
-          Подсказка:
+          Tip:
         </strong>{' '}
-        Примеры выше сгенерированы автоматически на основе полей коллекции "{collectionName}". Вы
-        можете использовать эти файлы как шаблон для подготовки своих данных.
+        The examples above are generated from the “{collectionName}” schema. Use them as a template
+        to prepare your own data files.
         <div
           style={{
             color: '#666',
@@ -238,10 +239,10 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
             marginTop: '8px',
           }}
         >
-          • Поля помеченные звездочкой (*) являются обязательными для заполнения
+          • Fields marked with an asterisk (*) are required
           <br />
-          • Поля с [auto] имеют значения по умолчанию и могут быть пропущены
-          <br />• Пустые поля в CSV будут заполнены значениями по умолчанию автоматически
+          • Fields with [auto] have default values and can be left blank
+          <br />• Empty CSV cells will be filled with default values automatically
         </div>
       </div>
     </div>

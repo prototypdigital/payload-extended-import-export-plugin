@@ -1,10 +1,10 @@
 export interface CollectionField {
   example?: string
-  hasDefaultValue?: boolean // Новое поле для индикации наличия значения по умолчанию
-  hasMany?: boolean // Для upload полей - поддерживает ли множественные значения
+  hasDefaultValue?: boolean // Indicates Presence of default value
+  hasMany?: boolean // Upload fields: supports multiple values
   label: string
   name: string
-  relationTo?: string // Для upload и relationship полей
+  relationTo?: string // Upload/relationship: target collection
   required?: boolean
   type: string
 }
@@ -15,9 +15,9 @@ export interface FieldMapping {
 }
 
 export interface ImportSettings {
-  compareField?: string // Поле для сравнения при обновлении
+  compareField?: string // Field used to match for updates
   fieldMappings: FieldMapping[]
-  locale?: string // Локаль для импорта
+  locale?: string // Selected locale for import
   mode: 'create' | 'update' | 'upsert'
 }
 

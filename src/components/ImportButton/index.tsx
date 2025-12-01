@@ -18,7 +18,7 @@ const ImportButtonServer = async (req: {
     (req.collectionConfig.labels.plural as any)[req.i18n.language] ||
     (req.collectionConfig.labels.plural as any).en
 
-  // Извлекаем только сериализуемые данные о полях
+  // Extract only serializable field metadata
   const collectionFields = extractCollectionFields(req.collectionConfig)
 
   return (

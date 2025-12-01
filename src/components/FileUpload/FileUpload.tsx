@@ -46,14 +46,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileChange, inputRef }) => {
 							fontWeight: '600',
 							color: '#111827'
 						}}>
-							Загрузите файл для импорта
+							Upload a file for import
 						</h3>
 						<p style={{
 							margin: '0 0 16px 0',
 							fontSize: '14px',
 							color: '#6b7280'
 						}}>
-							Перетащите файл сюда или нажмите для выбора
+							Drag a file here or click to choose one
 						</p>
 					</div>
 
@@ -107,11 +107,11 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileChange, inputRef }) => {
 				fontSize: '14px',
 				color: '#92400e'
 			}}>
-				<strong>📝 Поддерживаемые форматы:</strong>
+				<strong>📝 Supported formats:</strong>
 				<ul style={{ margin: '8px 0 0 0', paddingLeft: '20px' }}>
-					<li><strong>CSV</strong> - текстовые файлы с разделителями</li>
-					<li><strong>JSON</strong> - структурированные данные в формате JSON</li>
-					<li><strong>XLSX</strong> - файлы Microsoft Excel</li>
+					<li><strong>CSV</strong> - plain text files with delimiters</li>
+					<li><strong>JSON</strong> - structured data in JSON format</li>
+					<li><strong>XLSX</strong> - Microsoft Excel workbooks</li>
 				</ul>
 			</div>
 		</div>

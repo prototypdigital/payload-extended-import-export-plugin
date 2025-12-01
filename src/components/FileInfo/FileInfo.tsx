@@ -20,9 +20,9 @@ const FileInfo: React.FC<FileInfoProps> = ({ file, onClear }) => {
 			}}
 		>
 			<div>
-				<strong>Выбранный файл:</strong> {file.name}
+				<strong>Selected file:</strong> {file.name}
 				<br />
-				<small>Размер: {(file.size / 1024).toFixed(2)} KB</small>
+				<small>Size: {(file.size / 1024).toFixed(2)} KB</small>
 			</div>
 			<button
 				onClick={onClear}
@@ -36,7 +36,7 @@ const FileInfo: React.FC<FileInfoProps> = ({ file, onClear }) => {
 				}}
 			>
 				<X size={16} style={{ marginRight: "4px" }} />
-				Очистить
+				Clear
 			</button>
 		</div>
 	);

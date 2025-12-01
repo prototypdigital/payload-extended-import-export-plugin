@@ -3,7 +3,7 @@ import type { Collection, Field } from 'payload'
 import type { CollectionField } from '../types/import.js'
 
 /**
- * Извлекает поля из конфигурации коллекции Payload
+ * Extracts fields from a Payload collection config.
  */
 export const extractCollectionFields = (
   collectionConfig: Collection['config'],
@@ -11,23 +11,23 @@ export const extractCollectionFields = (
   const fields: CollectionField[] = []
 
   const processField = (field: Field, prefix = ''): void => {
-    // Пропускаем служебные поля
+    // Skip layout/service fields
     if (field.type === 'tabs' || field.type === 'collapsible' || field.type === 'row') {
-      // Для составных полей обрабатываем их дочерние поля
+      // Process child fields for composite structures
       if ('fields' in field && Array.isArray(field.fields)) {
         field.fields.forEach((subField) => processField(subField, prefix))
       }
       return
     }
 
-    // Пропускаем поля без имени
+    // Skip fields without a name
     if (!('name' in field) || !field.name) {
       return
     }
 
     const fieldName = prefix ? `${prefix}.${field.name}` : field.name
 
-    // Определяем label
+    // Resolve label value
     let label = field.name
     if ('label' in field && field.label) {
       if (typeof field.label === 'string') {
@@ -36,12 +36,12 @@ export const extractCollectionFields = (
         label = field.label.en
       }
     }
-    // Гарантируем, что label не пустой
+    // Ensure label is not empty
     if (!label || label.trim() === '') {
       label = field.name
     }
 
-    // Определяем тип поля
+    // Describe the field type
     let typeDescription: string = field.type
     let relationTo: string | undefined
     let hasMany: boolean | undefined
@@ -58,15 +58,14 @@ export const extractCollectionFields = (
       hasMany = 'hasMany' in field ? Boolean(field.hasMany) : false
     }
 
-    // Определяем обязательность
-    // Поле считается обязательным только если:
-    // 1. Явно помечено как required: true
-    // 2. И при этом НЕ имеет defaultValue
+    // Determine required flag:
+    // 1. Explicitly marked as required
+    // 2. And does NOT have a default value (Payload won't demand it if default exists)
     const hasRequired = 'required' in field ? Boolean(field.required) : false
     const hasDefaultValue = 'defaultValue' in field && field.defaultValue !== undefined
     const required = hasRequired && !hasDefaultValue
 
-    // Генерируем пример значения
+    // Generate an example value
     const example = generateFieldExample(field)
 
     const fieldData: CollectionField = {
@@ -78,7 +77,7 @@ export const extractCollectionFields = (
       required,
     }
 
-    // Добавляем дополнительную информацию для upload и relationship полей
+    // Attach extra info for upload/relationship fields
     if (relationTo) {
       fieldData.relationTo = relationTo
     }
@@ -88,33 +87,33 @@ export const extractCollectionFields = (
 
     fields.push(fieldData)
 
-    // Обрабатываем вложенные поля для group и blocks
+    // Process nested fields for group/blocks
     if (field.type === 'group' && 'fields' in field) {
       field.fields.forEach((subField) => processField(subField, fieldName))
     }
   }
 
-  // Добавляем поле id, которое автоматически создается Payload
+  // Prepend the implicit Payload `id` field
   fields.unshift({
     name: 'id',
     type: 'text',
-    example: 'Уникальный идентификатор записи',
-    hasDefaultValue: true, // ID создается автоматически
+    example: 'Auto-generated record ID',
+    hasDefaultValue: true, // ID is created automatically
     label: 'ID',
-    required: false, // Не требуется при создании, но может использоваться для обновления
+    required: false, // Not required on create, may be used for updates
   })
 
-  // Обрабатываем все поля коллекции
+  // Traverse all collection fields
   collectionConfig.fields.forEach((field) => processField(field))
 
   return fields
 }
 
 /**
- * Генерирует пример значения для поля
+ * Generates a sample value for the provided field.
  */
 const generateFieldExample = (field: Field): string => {
-  // Если есть значение по умолчанию, показываем его
+  // Prefer explicit default values when available
   if ('defaultValue' in field && field.defaultValue !== undefined) {
     if (
       typeof field.defaultValue === 'string' ||
@@ -123,7 +122,7 @@ const generateFieldExample = (field: Field): string => {
     ) {
       return String(field.defaultValue)
     }
-    return '[auto]' // Для сложных значений по умолчанию
+    return '[auto]' // Use placeholder for complex default values
   }
 
   switch (field.type) {
@@ -160,11 +159,11 @@ const generateFieldExample = (field: Field): string => {
         const relationTo = Array.isArray(field.relationTo)
           ? field.relationTo.join(' | ')
           : field.relationTo
-        return `ID записи из ${relationTo}`
+        return `Record ID from ${relationTo}`
       }
       return 'relationship-id'
     case 'richText':
-      return 'Форматированный текст'
+      return 'Formatted text'
 
     case 'select':
       if ('options' in field && Array.isArray(field.options) && field.options.length > 0) {
@@ -175,10 +174,10 @@ const generateFieldExample = (field: Field): string => {
     case 'text':
       if ('name' in field) {
         if (field.name === 'title' || field.name === 'name') {
-          return 'Название товара'
+          return 'Product title'
         }
         if (field.name === 'slug') {
-          return 'nazvanie-tovara'
+          return 'product-title'
         }
         if (field.name === 'sku') {
           return 'SKU-001'
@@ -187,10 +186,10 @@ const generateFieldExample = (field: Field): string => {
           return 'user@example.com'
         }
       }
-      return 'Текстовое значение'
+      return 'Text value'
 
     case 'textarea':
-      return 'Длинное текстовое описание...'
+      return 'Long form description...'
 
     case 'upload':
       if ('relationTo' in field) {
@@ -202,6 +201,6 @@ const generateFieldExample = (field: Field): string => {
       return 'image.jpg'
 
     default:
-      return 'Значение'
+      return 'Value'
   }
 }

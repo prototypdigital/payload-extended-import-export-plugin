@@ -13,7 +13,7 @@ const ImportProgressComponent: React.FC<ImportProgressComponentProps> = ({ onRes
   if (isComplete) {
     return (
       <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-        {/* Результат импорта */}
+        {/* Import result */}
         <div style={{ fontSize: '48px', marginBottom: '20px' }}>
           {progress.success > 0 ? '✅' : '❌'}
         </div>
@@ -25,10 +25,10 @@ const ImportProgressComponent: React.FC<ImportProgressComponentProps> = ({ onRes
             margin: '0 0 16px 0',
           }}
         >
-          Импорт завершен!
+          Import complete!
         </h2>
 
-        {/* Статистика */}
+        {/* Statistics */}
         <div
           style={{
             display: 'grid',
@@ -57,7 +57,7 @@ const ImportProgressComponent: React.FC<ImportProgressComponentProps> = ({ onRes
             >
               {progress.success}
             </div>
-            <div style={{ color: '#155724', fontSize: '14px' }}>Успешно</div>
+            <div style={{ color: '#155724', fontSize: '14px' }}>Successful</div>
           </div>
 
           {progress.failed > 0 && (
@@ -78,7 +78,7 @@ const ImportProgressComponent: React.FC<ImportProgressComponentProps> = ({ onRes
               >
                 {progress.failed}
               </div>
-              <div style={{ color: '#721c24', fontSize: '14px' }}>Ошибки</div>
+              <div style={{ color: '#721c24', fontSize: '14px' }}>Errors</div>
             </div>
           )}
 
@@ -99,11 +99,11 @@ const ImportProgressComponent: React.FC<ImportProgressComponentProps> = ({ onRes
             >
               {progress.total}
             </div>
-            <div style={{ color: '#0c5460', fontSize: '14px' }}>Всего</div>
+            <div style={{ color: '#0c5460', fontSize: '14px' }}>Total</div>
           </div>
         </div>
 
-        {/* Ошибки */}
+        {/* Error list */}
         {progress.errors.length > 0 && (
           <div
             style={{
@@ -114,7 +114,7 @@ const ImportProgressComponent: React.FC<ImportProgressComponentProps> = ({ onRes
               textAlign: 'left',
             }}
           >
-            <h4 style={{ color: '#721c24', margin: '0 0 12px 0' }}>Обнаруженные ошибки:</h4>
+            <h4 style={{ color: '#721c24', margin: '0 0 12px 0' }}>Detected errors:</h4>
             <div
               style={{
                 backgroundColor: '#f8d7da',
@@ -140,7 +140,7 @@ const ImportProgressComponent: React.FC<ImportProgressComponentProps> = ({ onRes
           </div>
         )}
 
-        {/* Кнопка сброса */}
+        {/* Reset button */}
         <div style={{ marginTop: '32px' }}>
           <button
             onClick={onReset}
@@ -156,27 +156,25 @@ const ImportProgressComponent: React.FC<ImportProgressComponentProps> = ({ onRes
             }}
             type="button"
           >
-            Импортировать еще файлы
+            Import more files
           </button>
         </div>
       </div>
     )
   }
 
-  // Процесс импорта
+  // Active import process
   return (
     <div style={{ padding: '40px 20px', textAlign: 'center' }}>
       <span aria-label="hourglass" role="img" style={{ fontSize: '48px', marginBottom: '20px' }}>
         ⏳
       </span>
 
-      <h2 style={{ fontSize: '24px', margin: '0 0 16px 0' }}>Импорт данных...</h2>
+      <h2 style={{ fontSize: '24px', margin: '0 0 16px 0' }}>Importing data...</h2>
 
-      <p style={{ color: '#666', margin: '0 0 32px 0' }}>
-        Пожалуйста, не закрывайте страницу во время импорта
-      </p>
+      <p style={{ color: '#666', margin: '0 0 32px 0' }}>Please keep the page open while importing</p>
 
-      {/* Прогресс бар */}
+      {/* Progress bar */}
       <div
         style={{
           margin: '0 auto 20px auto',
@@ -214,13 +212,13 @@ const ImportProgressComponent: React.FC<ImportProgressComponentProps> = ({ onRes
           }}
         >
           <span>
-            Обработано: {progress.processed} из {progress.total}
+            Processed: {progress.processed} of {progress.total}
           </span>
           <span>{Math.round(progressPercentage)}%</span>
         </div>
       </div>
 
-      {/* Детали процесса */}
+      {/* Process details */}
       <div
         style={{
           color: '#666',
@@ -228,10 +226,8 @@ const ImportProgressComponent: React.FC<ImportProgressComponentProps> = ({ onRes
           lineHeight: '1.5',
         }}
       >
-        <div>Проверка данных и создание записей...</div>
-        <div style={{ marginTop: '4px' }}>
-          Это может занять некоторое время в зависимости от размера файла
-        </div>
+        <div>Validating data and creating records...</div>
+        <div style={{ marginTop: '4px' }}>Duration depends on file size</div>
       </div>
     </div>
   )

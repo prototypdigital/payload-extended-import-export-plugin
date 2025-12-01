@@ -2,19 +2,19 @@ import type { Endpoint, PayloadRequest, RelationshipField } from 'payload'
 
 import { handleUploadField } from '../utils/upload-handler.js'
 
-// Функция для конвертации строки в формат Lexical richText
+// Converts plain text into minimal Lexical richText structure
 function convertStringToLexicalFormat(text: string) {
   if (!text || typeof text !== 'string') {
     return null
   }
 
-  // Разбиваем текст на параграфы по переносам строк
+  // Split by newlines and trim empty paragraphs
   const paragraphs = text
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean)
 
-  // Если нет параграфов, возвращаем пустую структуру
+  // Return an empty richText structure when no paragraphs remain
   if (paragraphs.length === 0) {
     return {
       root: {
@@ -37,7 +37,7 @@ function convertStringToLexicalFormat(text: string) {
     }
   }
 
-  // Создаем структуру Lexical для каждого параграфа
+  // Build Lexical paragraphs for every line
   const children = paragraphs.map((paragraph) => ({
     type: 'paragraph',
     children: [
@@ -92,7 +92,7 @@ export interface ImportResponse {
 export const importEndpoint: Endpoint = {
   handler: async (req: PayloadRequest) => {
     try {
-      // Читаем body как ReadableStream
+      // Read body as a ReadableStream to support large payloads
       let requestData: ImportRequest
 
       if (req.body) {
@@ -110,19 +110,19 @@ export const importEndpoint: Endpoint = {
 
         requestData = JSON.parse(bodyText) as ImportRequest
       } else {
-        throw new Error('Не удается получить данные из запроса')
+        throw new Error('Unable to read request payload')
       }
 
       const { collection, data, settings } = requestData
       const { compareField, fieldMappings, locale, mode } = settings
 
-      // Валидация входных данных
+      // Basic input validation
       if (!collection || !data || !Array.isArray(data)) {
         return Response.json(
           {
             created: 0,
-            errors: ['Отсутствуют обязательные поля: collection, data'],
-            message: 'Некорректные данные для импорта',
+            errors: ['Missing required fields: collection, data'],
+            message: 'Invalid import payload',
             success: false,
             updated: 0,
           },
@@ -135,17 +135,17 @@ export const importEndpoint: Endpoint = {
       const errors: string[] = []
       const details: any[] = []
 
-      // Маппинг данных согласно настройкам полей
+      // Map incoming rows according to configured field mappings
       const mappedDataPromises = data.map(async (row, index) => {
         try {
           const mapped: Record<string, any> = {}
 
-          // Получаем конфигурацию коллекции для определения типов полей
+          // Get collection config to understand field types
           const collectionConfig = req.payload.config.collections?.find(
             (col) => col.slug === collection,
           )
 
-          // Создаем карту типов полей для быстрого доступа
+          // Build a field-type map for quick lookups
           const fieldTypeMap = new Map<string, string>()
           if (collectionConfig) {
             const mapFieldTypes = (fields: any[], prefix = '') => {
@@ -156,7 +156,7 @@ export const importEndpoint: Endpoint = {
                 const fieldName = prefix ? `${prefix}.${field.name}` : field.name
                 fieldTypeMap.set(fieldName, field.type)
 
-                // Обрабатываем вложенные поля
+                // Traverse nested fields
                 if (field.fields && Array.isArray(field.fields)) {
                   mapFieldTypes(field.fields, fieldName)
                 }
@@ -164,11 +164,11 @@ export const importEndpoint: Endpoint = {
             }
             mapFieldTypes(collectionConfig.fields)
 
-            // Отладочная информация
+            // Debug logging in development mode
             if (process.env.NODE_ENV === 'development') {
-              console.log('Доступные поля в схеме:', Array.from(fieldTypeMap.keys()))
+              console.log('Available schema fields:', Array.from(fieldTypeMap.keys()))
               console.log(
-                'Маппинги полей:',
+                'Field mappings:',
                 fieldMappings.map((m) => `${m.csvField} -> ${m.collectionField}`),
               )
             }
@@ -176,29 +176,27 @@ export const importEndpoint: Endpoint = {
 
           for (const { collectionField, csvField } of fieldMappings) {
             if (row[csvField] !== undefined && row[csvField] !== '') {
-              // Для поля id просто присваиваем значение без дополнительной обработки
+              // Directly assign IDs without further processing
               if (collectionField === 'id') {
                 mapped[collectionField] = row[csvField]
                 return
               }
 
-              // Получаем тип поля
+              // Determine field type
               const fieldType = fieldTypeMap.get(collectionField)
 
-              // Пропускаем поля, которых нет в схеме коллекции (кроме id)
+              // Skip fields missing from the schema (except id)
               if (!fieldType && collectionField !== 'id') {
                 if (process.env.NODE_ENV === 'development') {
-                  console.warn(
-                    `Поле "${collectionField}" не найдено в схеме коллекции "${collection}"`,
-                  )
+                  console.warn(`Field "${collectionField}" was not found in "${collection}" schema`)
                 }
                 return
               }
 
-              // Обработка специальных типов полей
+              // Field-type specific handling
               let value = row[csvField]
 
-              // Обработка richText полей
+              // Convert richText strings into Lexical payloads
               if (fieldType === 'richText') {
                 value = convertStringToLexicalFormat(value)
               }
@@ -210,23 +208,23 @@ export const importEndpoint: Endpoint = {
                 })
 
                 if (isMultiple) {
-                  // Для множественных связей ожидаем массив значений
+                  // Multiple relationships expect an array of values
                   const items =
                     typeof value === 'string' ? value.split(',').map((v) => v.trim()) : value
                   value = items.map((item: any) => {
                     return {
-                      id: item, // Предполагаем, что это ID связанной записи
+                      id: item, // Assumes value is the ID of the related record
                     }
                   })
                 } else {
-                  // Для одиночных связей ожидаем объект с ID
+                  // Single relationships expect an object with ID
                   value = {
-                    id: value, // Предполагаем, что это ID связанной записи
+                    id: value, // Assumes value is the ID of the related record
                   }
                 }
               }
 
-              // Обработка upload полей
+              // Upload fields
               if (fieldType === 'upload') {
                 const uploadField = collectionConfig?.fields?.find((_field) => {
                   const field = _field as any
@@ -236,7 +234,7 @@ export const importEndpoint: Endpoint = {
                 if (uploadField && uploadField.relationTo) {
                   const hasMany = uploadField.hasMany || false
 
-                  // Обрабатываем загрузку изображений
+                  // Upload media referenced by URLs
                   value = await handleUploadField(
                     req.payload,
                     value,
@@ -246,22 +244,20 @@ export const importEndpoint: Endpoint = {
                 }
               }
 
-              // Обработка полей типа number
+              // Number coercion helpers
               if (fieldType === 'number') {
                 if (typeof value === 'string') {
-                  // Обработка специальных строковых значений
-                  if (
-                    value.toLowerCase().includes('есть') ||
-                    value.toLowerCase().includes('наличии')
-                  ) {
+                  // Handle common textual representations
+                  const normalized = value.toLowerCase()
+                  const positiveTokens = ['available', 'in stock', 'yes', 'true']
+                  const negativeTokens = ['not available', 'no', 'absent', 'out of stock', 'false']
+
+                  if (positiveTokens.some((token) => normalized.includes(token))) {
                     value = 1
-                  } else if (
-                    value.toLowerCase().includes('нет') ||
-                    value.toLowerCase().includes('отсутствует')
-                  ) {
+                  } else if (negativeTokens.some((token) => normalized.includes(token))) {
                     value = 0
                   } else {
-                    // Пытаемся извлечь число из строки
+                    // Extract numeric value from strings
                     const numValue = parseFloat(value.replace(/[^\d.,]/g, '').replace(',', '.'))
                     value = isNaN(numValue) ? 0 : numValue
                   }
@@ -270,34 +266,34 @@ export const importEndpoint: Endpoint = {
                 }
               }
 
-              // Обработка массивов (array fields)
+              // Array field handling
               if (fieldType === 'array') {
-                // Для array полей обеспечиваем правильную структуру
+                // Ensure we have valid JSON/array data
                 if (typeof value === 'string') {
                   try {
                     value = JSON.parse(value)
                   } catch {
-                    // Если не JSON, оставляем как строку
+                    // If parsing fails, leave as string
                   }
                 }
 
-                // Проверяем, что это массив
+                // Coerce into an array
                 if (!Array.isArray(value)) {
                   value = []
                 }
 
-                // Обрабатываем каждый элемент массива
+                // Process nested items
                 if (Array.isArray(value)) {
                   value = value.map((item, index) => {
                     if (typeof item === 'object' && item !== null) {
                       const processedItem = { ...item }
 
-                      // Обеспечиваем наличие id для каждого элемента
+                      // Ensure every item has an id
                       if (!processedItem.id) {
                         processedItem.id = `item_${index}_${Date.now()}`
                       }
 
-                      // Обрабатываем все поля внутри объекта как потенциальные relationship
+                      // Treat nested keys as potential relationship sub-fields
                       Object.keys(processedItem).forEach((key) => {
                         const subFieldType = fieldTypeMap.get(`${collectionField}.${key}`)
 
@@ -305,12 +301,12 @@ export const importEndpoint: Endpoint = {
                           const subValue = processedItem[key]
 
                           if (Array.isArray(subValue)) {
-                            // Для множественных связей
+                            // Handle multiple relationships
                             processedItem[key] = subValue.map((val) =>
                               typeof val === 'string' ? { id: val } : val,
                             )
                           } else if (typeof subValue === 'string') {
-                            // Для одиночных связей
+                            // Handle single relationships
                             processedItem[key] = { id: subValue }
                           }
                         }
@@ -327,9 +323,9 @@ export const importEndpoint: Endpoint = {
             }
           }
 
-          // Добавляем значения по умолчанию для обязательных полей только при создании
+          // Auto-fill required fields with defaults when creating new records
           if (collectionConfig && mode === 'create') {
-            // Обрабатываем все поля коллекции
+            // Walk through every field in the collection
             const processFields = (fields: any[], prefix = '') => {
               fields.forEach((field) => {
                 if (!field.name) {
@@ -338,28 +334,28 @@ export const importEndpoint: Endpoint = {
 
                 const fieldName = prefix ? `${prefix}.${field.name}` : field.name
 
-                // Проверяем, нужно ли заполнить поле
+                // Determine whether we need to populate the field
                 const isRequired = field.required === true
                 const hasDefaultValue = field.defaultValue !== undefined
                 const isNotMapped = mapped[fieldName] === undefined
 
                 if (isRequired && hasDefaultValue && isNotMapped) {
-                  // Если defaultValue это функция
+                  // Support functional defaultValue definitions
                   if (typeof field.defaultValue === 'function') {
                     try {
                       mapped[fieldName] = field.defaultValue({
                         user: req.user,
                       })
                     } catch (error) {
-                      console.warn(`Ошибка при вычислении defaultValue для ${fieldName}:`, error)
+                      console.warn(`Failed to compute defaultValue for ${fieldName}:`, error)
                     }
                   } else {
-                    // Если defaultValue это значение
+                    // Otherwise use the literal defaultValue
                     mapped[fieldName] = field.defaultValue
                   }
                 }
 
-                // Обрабатываем вложенные поля для group, tabs, etc.
+                // Process nested fields (group, tabs, etc.)
                 if (field.fields && Array.isArray(field.fields)) {
                   processFields(field.fields, fieldName)
                 }
@@ -371,16 +367,16 @@ export const importEndpoint: Endpoint = {
 
           return { index, mapped, original: row }
         } catch (error) {
-          errors.push(`Ошибка маппинга строки ${index + 1}: ${error}`)
+          errors.push(`Row ${index + 1} mapping error: ${error}`)
           return null
         }
       })
 
-      // Ожидаем выполнения всех промисов
+      // Wait for all mapping promises
       const mappedDataResults = await Promise.all(mappedDataPromises)
       const mappedData = mappedDataResults.filter(Boolean)
 
-      // Обработка данных согласно выбранному режиму
+      // Process mapped data according to the selected mode
       for (const item of mappedData) {
         if (!item) {
           continue
@@ -388,8 +384,7 @@ export const importEndpoint: Endpoint = {
 
         try {
           if (mode === 'create') {
-            // Только создание новых записей
-            // Убираем поле id из данных для создания, т.к. Payload создает ID автоматически
+            // Create-only: strip id because Payload generates it automatically
             const createData = { ...item.mapped }
             delete createData.id
 
@@ -405,11 +400,9 @@ export const importEndpoint: Endpoint = {
               data: createData,
             })
           } else if (mode === 'update') {
-            // Только обновление существующих записей
+            // Update-only path
             if (!compareField || !item.mapped[compareField]) {
-              errors.push(
-                `Строка ${item.index + 1}: отсутствует поле для сравнения "${compareField}"`,
-              )
+              errors.push(`Row ${item.index + 1}: missing compare field "${compareField}"`)
               continue
             }
 
@@ -432,8 +425,7 @@ export const importEndpoint: Endpoint = {
             })
 
             if (existing.docs.length > 0) {
-              // Для обновления записей объединяем существующие данные с новыми
-              // чтобы избежать валидации обязательных полей
+              // Merge with existing record to avoid required-field validation issues
               const existingData = existing.docs[0]
               const mergedData = { ...existingData, ...item.mapped }
 
@@ -451,11 +443,11 @@ export const importEndpoint: Endpoint = {
               })
             } else {
               errors.push(
-                `Строка ${item.index + 1}: запись с ${compareField}="${item.mapped[compareField]}" не найдена`,
+                `Row ${item.index + 1}: record with ${compareField}="${item.mapped[compareField]}" not found`,
               )
             }
           } else if (mode === 'upsert') {
-            // Создание или обновление
+            // Upsert: create or update depending on compareField match
             if (compareField && item.mapped[compareField]) {
               const existing = await req.payload.find({
                 collection: collection as any,
@@ -476,7 +468,7 @@ export const importEndpoint: Endpoint = {
               })
 
               if (existing.docs.length > 0) {
-                // Для обновления записей объединяем существующие данные с новыми
+                // Merge existing data with new payload before update
                 const existingData = existing.docs[0]
                 const mergedData = { ...existingData, ...item.mapped }
 
@@ -506,7 +498,7 @@ export const importEndpoint: Endpoint = {
                 })
               }
             } else {
-              // Если нет поля для сравнения, просто создаем
+              // No compare field: fall back to creating a new record
               const result = await req.payload.create({
                 collection: collection as any,
                 data: item.mapped,
@@ -521,8 +513,8 @@ export const importEndpoint: Endpoint = {
             }
           }
         } catch (error: any) {
-          // Добавляем подробную информацию об ошибке
-          let errorMessage = `Строка ${item.index + 1}: `
+          // Provide detailed error info
+          let errorMessage = `Row ${item.index + 1}: `
 
           if (error.message) {
             errorMessage += error.message
@@ -530,9 +522,9 @@ export const importEndpoint: Endpoint = {
             errorMessage += String(error)
           }
 
-          // В development режиме добавляем отладочную информацию
+          // Extra debug logging in development
           if (process.env.NODE_ENV === 'development') {
-            console.error('Ошибка при создании/обновлении записи:', {
+            console.error('Error while creating/updating record:', {
               error: error.message || error,
               data: item.mapped,
               collection,
@@ -547,18 +539,18 @@ export const importEndpoint: Endpoint = {
         created,
         details: process.env.NODE_ENV === 'development' ? details : undefined,
         errors,
-        message: `Импорт завершен: создано ${created}, обновлено ${updated} записей`,
+        message: `Import completed: created ${created}, updated ${updated} records`,
         success: true,
         updated,
       }
 
       return Response.json(response)
     } catch (error: any) {
-      console.error('Ошибка импорта:', error)
+      console.error('Import error:', error)
       const response: ImportResponse = {
         created: 0,
-        errors: [error.message || 'Неизвестная ошибка'],
-        message: 'Внутренняя ошибка сервера',
+        errors: [error.message || 'Unknown error'],
+        message: 'Internal server error',
         success: false,
         updated: 0,
       }
