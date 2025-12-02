@@ -1,6 +1,6 @@
 {
-  "name": "payload-extended-import-export-plugin",
-  "version": "1.0.11",
+  "name": "@prototyp/payload-extended-import-export-plugin",
+  "version": "1.0.16",
   "description": "This is an extensions of an already extended version of the Payload import-export plugin. It is translated to english only and has fixed styling for dark mode.",
   "license": "MIT",
   "author": "saroroce",

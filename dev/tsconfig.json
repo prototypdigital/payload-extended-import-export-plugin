@@ -17,9 +17,9 @@
     "baseUrl": "./",
     "paths": {
       "@payload-config": ["./payload.config.ts"],
-      "payload-extended-import-export-plugin": ["../src/index.ts"],
-      "payload-extended-import-export-plugin/client": ["../src/exports/client.ts"],
-      "payload-extended-import-export-plugin/rsc": ["../src/exports/rsc.ts"]
+      "@prototyp/payload-extended-import-export-plugin": ["../src/index.ts"],
+      "@prototyp/payload-extended-import-export-plugin/client": ["../src/exports/client.ts"],
+      "@prototyp/payload-extended-import-export-plugin/rsc": ["../src/exports/rsc.ts"]
     },
     "noEmit": true,
     "emitDeclarationOnly": false

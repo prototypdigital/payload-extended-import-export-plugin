@@ -38,7 +38,7 @@ export const payloadExtendedImportExportPlugin =
                   ...(collection.admin?.components?.listMenuItems || []),
                   {
                     exportName: 'ImportButtonServer',
-                    path: 'payload-extended-import-export-plugin/rsc',
+                    path: '@prototyp/payload-extended-import-export-plugin/rsc',
                   },
                 ],
               },

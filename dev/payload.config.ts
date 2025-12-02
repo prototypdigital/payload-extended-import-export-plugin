@@ -1,9 +1,9 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { payloadExtendedImportExportPlugin } from '@prototyp/payload-extended-import-export-plugin'
 import { MongoMemoryReplSet } from 'mongodb-memory-server'
 import path from 'path'
 import { buildConfig } from 'payload'
-import { payloadExtendedImportExportPlugin } from 'payload-extended-import-export-plugin'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
