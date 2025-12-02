@@ -391,7 +391,7 @@ export const importEndpoint: Endpoint = {
             const result = await req.payload.create({
               collection: collection as any,
               data: createData,
-              locale: (locale || req.locale || 'en') as 'bg' | 'en' | 'ru' | 'uk',
+              locale: (locale || req.locale || 'en-GB') as 'bg' | 'en-GB' | 'ru' | 'uk',
             })
             created++
             details.push({
@@ -409,7 +409,7 @@ export const importEndpoint: Endpoint = {
             const existing = await req.payload.find({
               collection: collection as any,
               limit: 1,
-              locale: (locale || req.locale || 'en') as 'bg' | 'en' | 'ru' | 'uk',
+              locale: (locale || req.locale || 'en-GB') as 'bg' | 'en-GB' | 'ru' | 'uk',
               where:
                 compareField === 'id'
                   ? {
@@ -433,7 +433,7 @@ export const importEndpoint: Endpoint = {
                 id: existing.docs[0].id,
                 collection: collection as any,
                 data: mergedData,
-                locale: (locale || req.locale || 'en') as 'bg' | 'en' | 'ru' | 'uk',
+                locale: (locale || req.locale || 'en-GB') as 'bg' | 'en-GB' | 'ru' | 'uk',
               })
               updated++
               details.push({
@@ -452,7 +452,7 @@ export const importEndpoint: Endpoint = {
               const existing = await req.payload.find({
                 collection: collection as any,
                 limit: 1,
-                locale: (locale || req.locale || 'en') as 'bg' | 'en' | 'ru' | 'uk',
+                locale: (locale || req.locale || 'en-GB') as 'bg' | 'en-GB' | 'ru' | 'uk',
                 where:
                   compareField === 'id'
                     ? {
@@ -476,7 +476,7 @@ export const importEndpoint: Endpoint = {
                   id: existing.docs[0].id,
                   collection: collection as any,
                   data: mergedData,
-                  locale: (locale || req.locale || 'en') as 'bg' | 'en' | 'ru' | 'uk',
+                  locale: (locale || req.locale || 'en-GB') as 'bg' | 'en-GB' | 'ru' | 'uk',
                 })
                 updated++
                 details.push({
@@ -488,7 +488,7 @@ export const importEndpoint: Endpoint = {
                 const result = await req.payload.create({
                   collection: collection as any,
                   data: item.mapped,
-                  locale: (locale || req.locale || 'en') as 'bg' | 'en' | 'ru' | 'uk',
+                  locale: (locale || req.locale || 'en-GB') as 'bg' | 'en-GB' | 'ru' | 'uk',
                 })
                 created++
                 details.push({
@@ -502,7 +502,7 @@ export const importEndpoint: Endpoint = {
               const result = await req.payload.create({
                 collection: collection as any,
                 data: item.mapped,
-                locale: (locale || req.locale || 'en') as 'bg' | 'en' | 'ru' | 'uk',
+                locale: (locale || req.locale || 'en-GB') as 'bg' | 'en-GB' | 'ru' | 'uk',
               })
               created++
               details.push({

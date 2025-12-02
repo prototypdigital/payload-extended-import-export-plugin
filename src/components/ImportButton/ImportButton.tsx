@@ -134,7 +134,7 @@ const ImportButton: React.FC<ImportButtonProps> = ({
         <span>Import {collection}</span>
       </Button>
       <Drawer slug={DRAWER_SLUG} title={`Import ${collection}`}>
-        <div style={{ minHeight: '500px', padding: '20px' }}>{renderContent()}</div>
+        <div style={{ minHeight: '500px', paddingBottom: '60px' }}>{renderContent()}</div>
       </Drawer>
     </>
   )

@@ -63,7 +63,6 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
         {/* CSV example */}
         <div
           style={{
-            backgroundColor: '#fff',
             border: '1px solid #ddd',
             borderRadius: '8px',
             overflow: 'hidden',
@@ -72,7 +71,6 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
           <div
             style={{
               alignItems: 'center',
-              backgroundColor: '#f8f9fa',
               borderBottom: '1px solid #ddd',
               display: 'flex',
               justifyContent: 'space-between',
@@ -88,7 +86,6 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
                 onClick={() => copyToClipboard(sampleCSV, 'csv')}
                 style={{
                   alignItems: 'center',
-                  backgroundColor: '#fff',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -105,7 +102,6 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
                 onClick={() => downloadFile(sampleCSV, `${collectionName}-sample.csv`, 'text/csv')}
                 style={{
                   alignItems: 'center',
-                  backgroundColor: '#fff',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -122,10 +118,9 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
           </div>
           <div
             style={{
-              backgroundColor: '#f8f8f8',
               fontFamily: 'monospace',
               fontSize: '12px',
-              maxHeight: '200px',
+              maxHeight: '400px',
               overflow: 'auto',
               padding: '12px',
               whiteSpace: 'pre-wrap',
@@ -138,7 +133,6 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
         {/* JSON example */}
         <div
           style={{
-            backgroundColor: '#fff',
             border: '1px solid #ddd',
             borderRadius: '8px',
             overflow: 'hidden',
@@ -147,7 +141,6 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
           <div
             style={{
               alignItems: 'center',
-              backgroundColor: '#f8f9fa',
               borderBottom: '1px solid #ddd',
               display: 'flex',
               justifyContent: 'space-between',
@@ -163,7 +156,6 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
                 onClick={() => copyToClipboard(sampleJSON, 'json')}
                 style={{
                   alignItems: 'center',
-                  backgroundColor: '#fff',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -182,7 +174,6 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
                 }
                 style={{
                   alignItems: 'center',
-                  backgroundColor: '#fff',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -199,10 +190,9 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
           </div>
           <div
             style={{
-              backgroundColor: '#f8f8f8',
               fontFamily: 'monospace',
               fontSize: '12px',
-              maxHeight: '200px',
+              maxHeight: '400px',
               overflow: 'auto',
               padding: '12px',
               whiteSpace: 'pre-wrap',
@@ -216,7 +206,7 @@ const SampleFiles: React.FC<SampleFilesProps> = ({ collectionFields, collectionN
       {/* Field information */}
       <div
         style={{
-          backgroundColor: '#e3f2fd',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
           border: '1px solid #bbdefb',
           borderRadius: '8px',
           fontSize: '14px',
