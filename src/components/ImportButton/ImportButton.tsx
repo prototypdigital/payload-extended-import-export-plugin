@@ -130,11 +130,10 @@ const ImportButton: React.FC<ImportButtonProps> = ({
         hidden toggler
       </DrawerToggler>
       <Button onClick={() => togglerRef.current?.click()}>
-        <Upload size={16} style={{ marginRight: '8px' }} />
         <span>Import {collection}</span>
       </Button>
       <Drawer slug={DRAWER_SLUG} title={`Import ${collection}`}>
-        <div style={{ minHeight: '500px', paddingBottom: '60px' }}>{renderContent()}</div>
+        {renderContent()}
       </Drawer>
     </>
   )
