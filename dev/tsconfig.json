@@ -16,20 +16,12 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@payload-config": [
-        "./payload.config.ts"
-      ],
-      "payload-extended-import-export-plugin": [
-        "../src/index.ts"
-      ],
-      "payload-extended-import-export-plugin/client": [
-        "../src/exports/client.ts"
-      ],
-      "payload-extended-import-export-plugin/rsc": [
-        "../src/exports/rsc.ts"
-      ]
+      "@payload-config": ["./payload.config.ts"],
+      "payload-extended-import-export-plugin": ["../src/index.ts"],
+      "payload-extended-import-export-plugin/client": ["../src/exports/client.ts"],
+      "payload-extended-import-export-plugin/rsc": ["../src/exports/rsc.ts"]
     },
     "noEmit": true,
-    "emitDeclarationOnly": false,
+    "emitDeclarationOnly": false
   }
 }

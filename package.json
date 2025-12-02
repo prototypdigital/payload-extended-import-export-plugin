@@ -1,12 +1,12 @@
 {
   "name": "payload-extended-import-export-plugin",
   "version": "1.0.11",
-  "description": "This is an extended version of the Payload CMS import-export plugin, providing additional features and enhancements.",
+  "description": "This is an extensions of an already extended version of the Payload import-export plugin. It is translated to english only and has fixed styling for dark mode.",
   "license": "MIT",
   "author": "saroroce",
   "repository": {
     "type": "github",
-    "url": "https://github.com/saroroce/payload-extended-import-export-plugin"
+    "url": ""
   },
   "type": "module",
   "exports": {
@@ -65,6 +65,7 @@
     "@types/node": "^22.5.4",
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
+    "autoprefixer": "^10.4.22",
     "copyfiles": "2.4.1",
     "cross-env": "^7.0.3",
     "eslint": "^9.23.0",
@@ -74,6 +75,7 @@
     "next": "15.4.4",
     "open": "^10.1.0",
     "payload": "3.37.0",
+    "postcss": "^8.5.6",
     "prettier": "^3.4.2",
     "qs-esm": "7.0.2",
     "react": "19.1.0",

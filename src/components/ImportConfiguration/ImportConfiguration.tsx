@@ -28,7 +28,7 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
   const [importMode, setImportMode] = useState<ImportMode>('create')
   const [fieldMappings, setFieldMappings] = useState<FieldMapping[]>([])
   const [compareField, setCompareField] = useState<string>('')
-  const [selectedLocale, setSelectedLocale] = useState<string>('en')
+  const [selectedLocale, setSelectedLocale] = useState<string>('en-GB')
 
   const canProceed = () => {
     // Update mode ignores required fields
@@ -82,7 +82,6 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
       <div
         style={{
           alignItems: 'center',
-          borderBottom: '1px solid #eee',
           display: 'flex',
           justifyContent: 'space-between',
           marginBottom: '24px',
@@ -149,7 +148,7 @@ const ImportConfiguration: React.FC<ImportConfigurationProps> = ({
       {/* Summary + action */}
       <div
         style={{
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
           borderRadius: '8px',
           marginTop: '24px',
           padding: '20px',

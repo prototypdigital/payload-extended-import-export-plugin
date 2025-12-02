@@ -144,8 +144,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
 
       <div
         style={{
-          backgroundColor: '#fff',
-          border: '1px solid #ddd',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
           borderRadius: '8px',
           overflow: 'hidden',
         }}
@@ -153,8 +152,8 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
         {/* Table header */}
         <div
           style={{
-            backgroundColor: '#f8f9fa',
-            borderBottom: '1px solid #ddd',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
             display: 'grid',
             fontSize: '14px',
             fontWeight: 'bold',
@@ -178,7 +177,8 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
               key={csvHeader}
               style={{
                 alignItems: 'center',
-                borderBottom: index < csvHeaders.length - 1 ? '1px solid #eee' : 'none',
+                borderBottom:
+                  index < csvHeaders.length - 1 ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
                 display: 'grid',
                 gridTemplateColumns: '1fr auto 1fr auto',
                 padding: '12px',
@@ -339,8 +339,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
         {importMode === 'update' && (
           <div
             style={{
-              backgroundColor: '#d1ecf1',
-              border: '1px solid #bee5eb',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
               borderRadius: '4px',
               fontSize: '14px',
               padding: '12px',
@@ -352,8 +351,8 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
               </span>{' '}
               Info:
             </strong>{' '}
-            When updating records, required fields do not need to be re-imported because they already
-            exist in the database.
+            When updating records, required fields do not need to be re-imported because they
+            already exist in the database.
           </div>
         )}
 
@@ -365,8 +364,7 @@ const FieldMappingComponent: React.FC<FieldMappingComponentProps> = ({
             return (
               <div
                 style={{
-                  backgroundColor: '#d1ecf1',
-                  border: '1px solid #bee5eb',
+                  backgroundColor: 'rgba(255, 0, 0, 0.1)',
                   borderRadius: '4px',
                   fontSize: '14px',
                   marginTop: '8px',

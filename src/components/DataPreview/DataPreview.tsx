@@ -1,7 +1,7 @@
 import { Table as TableIcon } from 'lucide-react'
 import React from 'react'
 
-import { TableData } from '../../utils/file-parsers.js'
+import type { TableData } from '../../utils/file-parsers.js'
 
 interface DataPreviewProps {
   onConfigure: () => void
@@ -56,9 +56,7 @@ const DataPreview: React.FC<DataPreviewProps> = ({ onConfigure, tableData }) => 
         style={{
           border: '1px solid #ddd',
           borderRadius: '8px',
-          maxHeight: '400px',
-          overflow: 'hidden',
-          overflowY: 'auto',
+          overflow: 'auto',
         }}
       >
         <table
@@ -68,11 +66,7 @@ const DataPreview: React.FC<DataPreviewProps> = ({ onConfigure, tableData }) => 
           }}
         >
           <thead>
-            <tr
-              style={{
-                backgroundColor: '#f8f9fa',
-              }}
-            >
+            <tr>
               {tableData.headers.map((header, index) => {
                 // Safely convert header to string
                 const headerValue =
@@ -82,7 +76,6 @@ const DataPreview: React.FC<DataPreviewProps> = ({ onConfigure, tableData }) => 
                   <th
                     key={index}
                     style={{
-                      backgroundColor: '#f8f9fa',
                       borderBottom: '2px solid #dee2e6',
                       fontWeight: 'bold',
                       padding: '12px',
@@ -99,12 +92,7 @@ const DataPreview: React.FC<DataPreviewProps> = ({ onConfigure, tableData }) => 
           </thead>
           <tbody>
             {tableData.rows.slice(0, 100).map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                style={{
-                  backgroundColor: rowIndex % 2 === 0 ? '#fff' : '#f9f9f9',
-                }}
-              >
+              <tr key={rowIndex}>
                 {row.map((cell, cellIndex) => {
                   // Safely convert value to string
                   const cellValue = cell === null || cell === undefined ? '' : String(cell)
@@ -132,7 +120,6 @@ const DataPreview: React.FC<DataPreviewProps> = ({ onConfigure, tableData }) => 
         {tableData.rows.length > 100 && (
           <div
             style={{
-              backgroundColor: '#f8f9fa',
               borderTop: '1px solid #dee2e6',
               color: '#666',
               padding: '12px',

@@ -62,8 +62,10 @@ const ImportModeSelector: React.FC<ImportModeSelectorProps> = ({
             key={mode.value}
             style={{
               alignItems: 'flex-start',
-              backgroundColor: selectedMode === mode.value ? '#f8f9ff' : '#fff',
-              border: selectedMode === mode.value ? '2px solid #007bff' : '1px solid #ddd',
+              border:
+                selectedMode === mode.value
+                  ? '2px solid #007bff'
+                  : '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '8px',
               cursor: 'pointer',
               display: 'flex',
@@ -106,7 +108,7 @@ const ImportModeSelector: React.FC<ImportModeSelectorProps> = ({
       {(selectedMode === 'update' || selectedMode === 'upsert') && (
         <div
           style={{
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
             borderRadius: '8px',
             marginTop: '16px',
             padding: '16px',

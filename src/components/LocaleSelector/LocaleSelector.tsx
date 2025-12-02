@@ -6,12 +6,7 @@ interface LocaleSelectorProps {
 }
 
 const LocaleSelector: React.FC<LocaleSelectorProps> = ({ value, onChange }) => {
-  const locales = [
-    { code: 'en', label: 'English' },
-    { code: 'ru', label: 'Russian' },
-    { code: 'uk', label: 'Ukrainian' },
-    { code: 'bg', label: 'Bulgarian' },
-  ]
+  const locales = [{ code: 'en-GB', label: 'English' }]
 
   return (
     <div style={{ marginBottom: '16px' }}>
@@ -33,7 +28,6 @@ const LocaleSelector: React.FC<LocaleSelectorProps> = ({ value, onChange }) => {
           border: '1px solid #ddd',
           borderRadius: '4px',
           fontSize: '14px',
-          backgroundColor: '#fff',
         }}
         value={value}
       >
